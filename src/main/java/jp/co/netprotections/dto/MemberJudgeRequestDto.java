@@ -2,6 +2,12 @@
 package jp.co.netprotections.dto;
 
 
+/*
+ * Request受けた隊員情報　Class
+ * 
+ * */
+
+
 public class MemberJudgeRequestDto {
 	
 	private String memberName;

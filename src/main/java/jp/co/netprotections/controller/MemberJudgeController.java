@@ -1,152 +1,134 @@
 package jp.co.netprotections.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.lang.reflect.Array;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.List;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
-
 import jp.co.netprotections.dto.MemberInfo;
 import jp.co.netprotections.dto.MemberJudgeRequestDto;
 import jp.co.netprotections.dto.MemberJudgeResponse;
 import jp.co.netprotections.dto.MemberJudgeResponseDto;
 
-
+/**
+ * 隊員判定コントローラクラス
+ */
 @RestController
 public class MemberJudgeController {
 	
-	
+	/**
+	 * Controller
+	 * @param MemberInfo info
+	 * @return MemberJudgeResponse response
+	 * */
 	
 	@RequestMapping(value="/execute", method=RequestMethod.POST, consumes=org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public MemberJudgeResponse list(@RequestBody MemberInfo info) throws Exception {
-		//JSON -> JAVA -> JSON
 	
-		
-		ArrayList<MemberJudgeRequestDto> memList = new ArrayList<MemberJudgeRequestDto>();
-		
-		//All data print-test
-		//System.out.println(new ObjectMapper().writeValueAsString(info));
-		//json String data -> JAVA Beans data save(ArrayList)
+		// responseするレスポンスを初期化
 		MemberJudgeResponse response = new MemberJudgeResponse();
+		
+		//responseBoye(info)を保存 
+		//getMemberCandidatesList() - responseBody
+		ArrayList<MemberJudgeRequestDto> memList = info.getMemberCandidatesList();
 		ArrayList<MemberJudgeResponseDto> responseDtoList = new ArrayList<MemberJudgeResponseDto>();
 		
-		//json -> javaBean 完了
-		for(int i=0;i<info.getMemberCandidatesList().size();i++) {
-			MemberJudgeRequestDto dto = new MemberJudgeRequestDto();
-			//data -> ArrayList
-			dto.setCogitation(info.getMemberCandidatesList().get(i).getCogitation());	
-			dto.setCoodination(info.getMemberCandidatesList().get(i).getCoodination());
-			dto.setEventPlanning(info.getMemberCandidatesList().get(i).getEventPlanning());
-			dto.setInfrastructureKnowledge(info.getMemberCandidatesList().get(i).getInfrastructureKnowledge());
-			dto.setMemberName(info.getMemberCandidatesList().get(i).getMemberName());
-			dto.setProgrammingAbility(info.getMemberCandidatesList().get(i).getProgrammingAbility());
-			
-			memList.add(i, dto);
-			//JSON(info) -> ArrayList 変換完了 （memberList-dto）
-		}
-		
-		int count = 0;
+		// 
 		int total =0;
 		
+		/**
+		 * @param MemberJudgeResponseDto responseDto
+		 * @return ArrayList<MemberJudgeResponseDto> responseDtoList
+		 * */
+		
+		/*
+		 * 処理の前提チェック
+		 * 不正が以下の2つある場合は処理を中断　→　空のレスポンスを返却
+		 * 
+		 * 不正どは？
+		 * 名前がない場合
+		 * 隊員の属性が0以上5以下以外の場合
+		 * */
+		
+		MemberJudgeRequestDto requestDto = new MemberJudgeRequestDto();
+		//0 全体隊員を反復検査のためのfor()
 		for(int i=0;i<memList.size();i++) {
+
+			//0 隊員一人ずつ検査します。
+			requestDto = memList.get(i);
+			
+			//O 隊員の属性が0以上5以下以外検査します。
+			if(requestDto.getCogitation()<0&&requestDto.getCogitation()>5) {
+				//0~5以外の場合、空を入れます。　 (空の意味でNULL値を入れたですか。。)
+				response.setJudgedCandidatesResultList(null);
+				//0   リスポンスを空に返却する。　
+				return response;
+			}else if(requestDto.getCoodination()<0&&requestDto.getCoodination()>5) {
+				response.setJudgedCandidatesResultList(null);
+				return response;
+			}else if(requestDto.getEventPlanning()<0&&requestDto.getEventPlanning()>5) {
+				response.setJudgedCandidatesResultList(null);
+				return response;
+			}else if(requestDto.getInfrastructureKnowledge()<0&&requestDto.getInfrastructureKnowledge()>5) {
+				response.setJudgedCandidatesResultList(null);
+				return response;
+			}else if(requestDto.getProgrammingAbility()<0&&requestDto.getProgrammingAbility()>5) {
+				response.setJudgedCandidatesResultList(null);
+				return response;
+			}
+			
+			//nameがない隊員判断 
+			if(memList.get(i).getMemberName()==null) {
+
+				//0  名前をNULLの変更
+				for(int j=0;j<memList.size();j++) {
+				memList.get(j).setMemberName(null);				
+				memList.get(j).setEnlistedPropriety(false);
+					}
+				}
+		}	
+		
+	
+		//0  リスポンスする隊員リスト保存　＆　 適正判断の計算ロジック
+		
+		for(int i=0;i<memList.size();i++) {
+			
+			//0  臨時隊員class 初期化
 			MemberJudgeResponseDto responseDto = new MemberJudgeResponseDto();
-			 
+			
+			//0 処理の前提チェックが終わった隊員の名前をリスポンスする客体に保存
 			responseDto.setMemberName(memList.get(i).getMemberName());
+			
+			//0   属性合計計算
 			total= memList.get(i).getCogitation()+memList.get(i).getCoodination()+memList.get(i).getEventPlanning()+memList.get(i).getInfrastructureKnowledge()
 				+memList.get(i).getProgrammingAbility();
-			//属性0~5判断 && (2)適正判断の計算ロジック
-			if(memList.get(i).getCogitation()>=0 && memList.get(i).getCogitation()<=5) {
-				responseDto.setCogitation(memList.get(i).getCogitation());
-				responseDto.setEnlistedPropriety(true);
-			}else {
-				responseDto.setEnlistedPropriety(true);
 			
-				memList.get(i).setMemberName(null);
-				count++;
-			}
-			if(memList.get(i).getCoodination()>=0 && memList.get(i).getCoodination()<=5) {
-				responseDto.setCoodination(memList.get(i).getCoodination());
-				responseDto.setEnlistedPropriety(true);
-			}else {	//調整力処理
+			//0  適正判断の計算ロジック　-  イベント企画力が1以下は入隊不可能
+			if(memList.get(i).getEventPlanning()<=1){
+				//0  条件と合った場合は入隊不可能
 				responseDto.setEnlistedPropriety(false);
-				memList.get(i).setMemberName(null);
-				count++;
-			}
-			if(memList.get(i).getEventPlanning()>=0 && memList.get(i).getEventPlanning()<=5) {
-				responseDto.setEventPlanning(memList.get(i).getEventPlanning());
-				responseDto.setEnlistedPropriety(true);
-			}else if(memList.get(i).getEventPlanning()<=1){	//イベント企画力処理
-				responseDto.setEnlistedPropriety(false);
-			}else {
-				responseDto.setEnlistedPropriety(false);
-				memList.get(i).setMemberName(null);
-				count++;
-				}
+			}else responseDto.setEnlistedPropriety(true);	//0  入隊可能
 			
-			if(memList.get(i).getInfrastructureKnowledge()>=0 && memList.get(i).getInfrastructureKnowledge()<=5) {
-				responseDto.setInfrastructureKnowledge(memList.get(i).getInfrastructureKnowledge());
-				responseDto.setEnlistedPropriety(true);	
-			}else {
-				responseDto.setEnlistedPropriety(false);
-				memList.get(i).setMemberName(null);
-				count++;
-			}
 			
-
-         
-			if(memList.get(i).getProgrammingAbility()>=0 && memList.get(i).getProgrammingAbility()<=5) {
-				responseDto.setProgrammingAbility(memList.get(i).getProgrammingAbility());
-				responseDto.setEnlistedPropriety(true);	
-			}else {
-				responseDto.setEnlistedPropriety(false);
-				memList.get(i).setMemberName(null);
-				count++;
-			}
-			
-			//total score 処理
+			/**
+			 * 
+			 *  適正判断の計算ロジック　- total score 処理
+			 *  隊員の属性の合計が１０以下場合入隊不可能
+			 * */
 			if(total<=10) {
 				responseDto.setEnlistedPropriety(false);
-			}
-			if(count>=2) {
-				//空のリスポンス返却
-				//response = null;
-				break;
-			}
-			responseDtoList.add(i,responseDto);
+			}else responseDto.setEnlistedPropriety(true);
 			
-//			if(responseDto.isEnlistedPropriety()==false) {
-//				responseDtoList.remove(i);
-//			}
-			
+			//0  検査が終わった隊員のリストを作りなす。
+			responseDtoList.add(responseDto);
 		}
-		
-		
-		
-		
-		//Gson gson = new GsonBuilder().create();	
-		//ArrayList -> Json
-		
-		//for(int i=0;i<responseDtoList.size()-1;i++) {
-			//name, enlistedPropriety
-			// resultString = gson.toJson(gson.toJson(responseDtoList.get(i)));
-			// System.out.println(gson.toJson(tempList.get(i)));
-		//}
+		//0  最後に処理が全部終わったリストをリスポンスする客体に保存
 		response.setJudgedCandidatesResultList(responseDtoList);
-		//System.out.println(resultString);
+			
+		
+		//0 処理をしたレスポンスインスタンスを返却 
 		return response;
 	}
 	
