@@ -1,7 +1,9 @@
 package jp.co.netprotections.dto;
 
 /**
-  *  Responseする隊員の情報class
+  *　@author m.shin
+  *  @see MeberjudgeService 
+  *  処理完了したResponse DTO
   *  
  */
 public class MemberJudgeResponseDto {

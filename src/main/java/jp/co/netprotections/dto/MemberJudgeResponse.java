@@ -1,20 +1,20 @@
 package jp.co.netprotections.dto;
 
-import java.util.ArrayList;
+import java.util.List;
 
-/*
- * リスポンスClass
- * ArrayList<MemberJudgeResponseDto> judgedCandidatesResultList 
- * の中には処理ができた隊員リストが入っています。
+/**
+ * @author m.shin
+ *  Controllerのresponseです.
+ *@param ArrayList<MemberJudgeResponseDto> judgedCandidatesResultList 
+ *@return ArrayList<MemberJudgeResponseDto> judgedCandidatesResultList
  * */
 
 public class MemberJudgeResponse {
-	//private ArrayList<MemberJudgeRequestDto> memberCandidatesList;
-	private ArrayList<MemberJudgeResponseDto> judgedCandidatesResultList;
-	public ArrayList<MemberJudgeResponseDto> getJudgedCandidatesResultList() {
+	private List<MemberJudgeResponseDto> judgedCandidatesResultList;
+	public List<MemberJudgeResponseDto> getJudgedCandidatesResultList() {
 		return judgedCandidatesResultList;
 	}
-	public void setJudgedCandidatesResultList(ArrayList<MemberJudgeResponseDto> judgedCandidatesResultList) {
+	public void setJudgedCandidatesResultList(List<MemberJudgeResponseDto> judgedCandidatesResultList) {
 		this.judgedCandidatesResultList = judgedCandidatesResultList;
 	}
 

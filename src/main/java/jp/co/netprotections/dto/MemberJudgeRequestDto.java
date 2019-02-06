@@ -2,14 +2,14 @@
 package jp.co.netprotections.dto;
 
 
-/*
- * Request受けた隊員情報　Class
+/**
+ *request JSONをMappingするDTOです
+ * @author m.shin
  * 
  * */
 
 
 public class MemberJudgeRequestDto {
-	
 	private String memberName;
 	private int eventPlanning;
 	private int cogitation;

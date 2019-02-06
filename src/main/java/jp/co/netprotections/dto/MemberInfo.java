@@ -1,18 +1,21 @@
 package jp.co.netprotections.dto;
 
 import java.util.ArrayList;
+import java.util.List;
 
-/*
- * ResponseBodyを受けるClass
- * 
+/**
+ * @author m.shin
+ *  ReqeustBobyをrequestです
+ * @param List<MemberJudgeRequestDto> memberCandidatesList
+ * @return List<MemberJudgeRequestDto> memberCandidatesList
  * */
 
 public class MemberInfo {
 	
 	//0  隊員たちのリスト
-	private ArrayList<MemberJudgeRequestDto> memberCandidatesList;
+	private List<MemberJudgeRequestDto> memberCandidatesList;
 
-	public ArrayList<MemberJudgeRequestDto> getMemberCandidatesList() {
+	public List<MemberJudgeRequestDto> getMemberCandidatesList() {
 		return memberCandidatesList;
 	}
 
