@@ -22,24 +22,24 @@ public class MemberjudgeService {
 		//Controllerへresponseするresult初期化
 		MemberJudgeResponse res = new MemberJudgeResponse();
 		
-		//0 隊員全体を含めるList
+		//隊員全体を含めるList
 		List<MemberJudgeResponseDto> judgedList = new ArrayList<MemberJudgeResponseDto>();
 		
 		//response
 		for(int i=0;i<memList.size();i++) {
-			//0 一人ずつ検査するため臨時客体初期化
+			//一人ずつ検査するため臨時客体初期化
 			MemberJudgeResponseDto resDto = new MemberJudgeResponseDto();
 			
-			//0 処理の前提チェックを実行する、不正な隊員がいる場合リストを空にする
-			if(this.hasValidinput(memList.get(i)) == false) {
-				res.setJudgedCandidatesResultList(null);	//0 空の意味でNULL
+			//処理の前提チェックを実行する、不正な隊員がいる場合リストを空にする
+			if(!this.hasValidinput(memList.get(i))) {
+				res.setJudgedCandidatesResultList(null);	//空の意味でNULL
 			}else {
-				//0 適正判断の計算ロジックを実行する　→　入隊判断
+				//適正判断の計算ロジックを実行する　→　入隊判断
 				resDto.setEnlistedPropriety(this.calculation(memList.get(i)));
 				}	
-				//0 処理が終わった隊員の名前保存
+				//処理が終わった隊員の名前保存
 				resDto.setMemberName(memList.get(i).getMemberName());	
-				//0　リストに追加
+				//リストに追加
 				judgedList.add(resDto);
 				}	
 	
@@ -59,13 +59,12 @@ public class MemberjudgeService {
 	 * */
 	private boolean hasValidinput(MemberJudgeRequestDto member) {
 
-		//0 名前がない隊員判断 
-		if(member.getMemberName()==null) {
-			//0  名前をNULLの変更
+		//名前がない隊員判断 (名前が無いとはnullまたは""です)
+		if(member.getMemberName()==null||member.getMemberName()=="") {
+			//名前をNULLの変更
 			member.setMemberName(null);				
-			//member.setEnlistedPropriety(false);
 		}
-		//0 隊員の各属性前提チェック　
+		//隊員の各属性前提チェック　
 		if(member.getCogitation()<0&&member.getCogitation()>5) {
 			return false;
 		}else if(member.getCoodination()<0&&member.getCoodination()>5) {
@@ -87,17 +86,18 @@ public class MemberjudgeService {
 	 * @return true || false
 	 * */
 	private boolean calculation(MemberJudgeRequestDto member) {
-		//0   隊員の属性の合計が１０以下場合入隊不可能
+		//隊員の属性の合計が１０以下場合入隊不可能
 		int total = member.getCogitation()+member.getCoodination()+member.getEventPlanning()
 		+member.getInfrastructureKnowledge()+member.getProgrammingAbility();
+		if(total<=10) return false;
 		
-		if(total<=10) {
-			return false;
-		}
-		//0  適正判断の計算ロジック　-  イベント企画力が1以下は入隊不可能
-		else if(member.getEventPlanning()<=1) return false;	//0  条件と合った場合は入隊不可能
+		//イベント企画力が1以下のか判断（以下の場合、入隊不可能）
+		else if(member.getEventPlanning()<=1) return false;
 		
-		//0 異常がなければtrue
+		//調整力が１以下のか判断（以下の場合、入隊不可能）
+		else if(member.getCoodination()<=1) return false;
+		
+		//異常がなければtrue
 		return true;
 	}
 

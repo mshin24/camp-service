@@ -12,7 +12,7 @@ import java.util.List;
 
 public class MemberInfo {
 	
-	//0  隊員たちのリスト
+	//隊員たちのリスト
 	private List<MemberJudgeRequestDto> memberCandidatesList;
 
 	public List<MemberJudgeRequestDto> getMemberCandidatesList() {

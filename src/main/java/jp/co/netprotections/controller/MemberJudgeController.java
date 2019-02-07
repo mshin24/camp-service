@@ -26,19 +26,19 @@ public class MemberJudgeController {
 	@ResponseBody
 	public MemberJudgeResponse list(@RequestBody MemberInfo info) throws Exception {
 	
-		// responseするレスポンスを初期化
+		//responseするレスポンスを初期化
 		MemberJudgeResponse response = new MemberJudgeResponse();
 		
-		// responseBobyをListへ保存
+		//responseBobyをListへ保存
 		List<MemberJudgeRequestDto> memList =  info.getMemberCandidatesList();
 		
 		/**@service 初期化*/
 		MemberjudgeService service = new MemberjudgeService();
 		
-		//0 service処理が完了出来た情報response保存
+		//service処理が完了出来た情報response保存
 		response = service.judgeQualification(memList);		
 
-		//0 処理をしたレスポンスインスタンスを返却 
+		//処理をしたレスポンスインスタンスを返却 
 		return response;
 	}
 	
