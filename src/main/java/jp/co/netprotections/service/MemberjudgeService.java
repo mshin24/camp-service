@@ -30,25 +30,25 @@ public class MemberjudgeService {
 			//一人ずつ検査するため臨時客体初期化
 			MemberJudgeResponseDto resDto = new MemberJudgeResponseDto();
 			
-			//処理の前提チェックを実行する、不正な隊員がいる場合リストを空にする
-			if(!this.hasValidinput(memList.get(i))) {
-				res.setJudgedCandidatesResultList(null);	//空の意味でNULL
-			}else {
+			//処理の前提チェックを実行する
+			if(this.hasValidinput(memList.get(i))) {
 				//適正判断の計算ロジックを実行する　→　入隊判断
 				resDto.setEnlistedPropriety(this.calculation(memList.get(i)));
-				}	
-				//処理が終わった隊員の名前保存
-				resDto.setMemberName(memList.get(i).getMemberName());	
-				//リストに追加
-				judgedList.add(resDto);
-				}	
-	
+			}
+			else resDto.setEnlistedPropriety(false);
+			
+			//処理が終わった隊員の名前保存
+			resDto.setMemberName(memList.get(i).getMemberName());	
+			//リストに追加
+			judgedList.add(resDto);
+		}
 		//responseにリスト保存
 		res.setJudgedCandidatesResultList(judgedList);
 		
 		//controllerへresponse
 		return res;
 	}
+	
 
 	
 	/**
@@ -58,24 +58,40 @@ public class MemberjudgeService {
 	 * @return true || false
 	 * */
 	private boolean hasValidinput(MemberJudgeRequestDto member) {
-
+		
+		//名前にString 以外数字が入った場合、名前をnullにする。
+		try {
+			Integer.parseInt(member.getMemberName());
+			member.setMemberName(null);
+			return false;
+		}catch(Exception e) {
+			
+		}
+		
 		//名前がない隊員判断 (名前が無いとはnullまたは""です)
 		if(member.getMemberName()==null||member.getMemberName()=="") {
 			//名前をNULLの変更
 			member.setMemberName(null);				
+			return false;
 		}
 		//隊員の各属性前提チェック　
-		if(member.getCogitation()<0&&member.getCogitation()>5) {
+		if(member.getCogitation()<1 || member.getCogitation()>5 ) {
 			return false;
-		}else if(member.getCoodination()<0&&member.getCoodination()>5) {
+		}
+		if(member.getCoodination()<1 || member.getCoodination()>5) {
 			return false;
-		}else if(member.getEventPlanning()<0&&member.getEventPlanning()>5) {
+		}
+		if(member.getEventPlanning()<1 || member.getEventPlanning()>5) {
 			return false;
-		}else if(member.getInfrastructureKnowledge()<0&&member.getInfrastructureKnowledge()>5) {
+		}
+		if(member.getInfrastructureKnowledge()<1|| member.getInfrastructureKnowledge()>5) {
 			return false;
-		}else if(member.getProgrammingAbility()<0&&member.getProgrammingAbility()>5) {
+		}
+		if(member.getProgrammingAbility()<1||member.getProgrammingAbility()>5) {
 			return false;
-		}else return true;//異常がなければtrue
+		}
+		
+		return true;
 	}
 	
 
@@ -92,12 +108,11 @@ public class MemberjudgeService {
 		if(total<=10) return false;
 		
 		//イベント企画力が1以下のか判断（以下の場合、入隊不可能）
-		else if(member.getEventPlanning()<=1) return false;
+		if(member.getEventPlanning()<=1) return false;
 		
 		//調整力が１以下のか判断（以下の場合、入隊不可能）
-		else if(member.getCoodination()<=1) return false;
+		if(member.getCoodination()<=1) return false;
 		
-		//異常がなければtrue
 		return true;
 	}
 
