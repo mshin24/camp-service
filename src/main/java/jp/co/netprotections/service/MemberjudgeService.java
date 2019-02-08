@@ -25,9 +25,14 @@ public class MemberjudgeService {
 		//隊員全体を含めるList
 		List<MemberJudgeResponseDto> judgedList = new ArrayList<MemberJudgeResponseDto>();
 		
+		// そもそもリストがnullなら空のレスポンスを返却する
+		if(memList == null) {
+			return res;
+		}
+		
 		//response
 		for(int i=0;i<memList.size();i++) {
-			//一人ずつ検査するため臨時客体初期化
+			//一人ずつ検査するため臨時客体(tmpのオブジェクト)初期化
 			MemberJudgeResponseDto resDto = new MemberJudgeResponseDto();
 			
 			//処理の前提チェックを実行する
